@@ -1,0 +1,17 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+    max-width: 600px;
+    margin: 40px;
+    padding: 0 16px;
+}
+input {
+    padding: 8px;
+    width: 70%;
+}
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+li {
+    margin: 8px 0;
+}
