@@ -1,0 +1,47 @@
+# arquivo .http pra testar a api sem ficar montando tudo no postman toda hora
+# provavelmente tu ja deve ter a extensao do rest client no vs code entao vai aparecer o send requests
+
+# aqui eu defino a url base local
+@baseUrl = http://localhost:3000
+
+###
+# teste rapido pra ver se a api subiu
+GET {{baseUrl}}/health
+
+###
+# listar todas as tasks
+GET {{baseUrl}}/tasks
+
+###
+# criar task nova
+# aqui eu mando o titulo, e o backend coloca done = false por padrao
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Fazer o front para esse projeto, mesmo que fique feio kkk"
+}
+
+###
+# buscar task por id
+# troca o numero se precisar
+GET {{baseUrl}}/tasks/2
+
+###
+# atualizar task por id
+# aqui pode mudar title e done
+PUT {{baseUrl}}/tasks/3
+Content-Type: application/json
+
+{
+  "title": "Task atualizada no .http",
+  "done": true
+}
+
+###
+# deleta task por id
+DELETE {{baseUrl}}/tasks/3
+
+###
+# listar de novo so pra confirmar como ficou depois dos testes
+GET {{baseUrl}}/tasks
