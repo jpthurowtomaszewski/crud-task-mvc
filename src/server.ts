@@ -12,35 +12,39 @@ const app = express();
 // tento pegar a porta do .env; se nao tiver, uso 3000
 const PORT = process.env.PORT || 3000;
 
+// libera qualquer origem, sem travar dominio
+app.use(cors());
+
+// vou deixar a parte do cors comentada para tentar mexer depois, não sei como arrumar agora, entao vou deixar assim
 // aqui eu pego a url do front em producao
-const FRONTEND_URL = process.env.FRONTEND_URL;
-
+// const FRONTEND_URL = process.env.FRONTEND_URL;
+//
 // lista das origens permitidas
-const allowedOrigins = [
-  "http://localhost:5500",
-  "http://127.0.0.1:5500",
-  FRONTEND_URL
-].filter(Boolean) as string[];
-
+// const allowedOrigins = [
+//   "http://localhost:5500",
+//   "http://127.0.0.1:5500",
+//   FRONTEND_URL
+// ].filter(Boolean) as string[];
+//
 // cors mais fechado: so deixa origem que eu permiti
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // só pode testar no postman ou por essas origens que defini la em cima
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error("Origem nao permitida no CORS"));
-    }
-  })
-);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       // so pode testar no postman ou por essas origens que defini la em cima
+//       if (!origin) {
+//         callback(null, true);
+//         return;
+//       }
+//
+//       if (allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//         return;
+//       }
+//
+//       callback(new Error("Origem nao permitida no CORS"));
+//     }
+//   })
+// );
 
 // fala pro express entender json no body
 app.use(express.json());
