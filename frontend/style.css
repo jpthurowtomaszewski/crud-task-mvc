@@ -1,17 +1,54 @@
 body {
     font-family: 'Times New Roman', Times, serif;
-    max-width: 600px;
-    margin: 40px;
+    max-width: 700px;
+    margin: 40px auto;
     padding: 0 16px;
+}
+h1 {
+    margin-bottom: 14px;
+}
+.form-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 input {
     padding: 8px;
-    width: 70%;
+}
+
+#titleInput {
+    width: 100%;
 }
 button {
     padding: 8px 12px;
     cursor: pointer;
 }
+#messageBox {
+    min-height: 20px;
+    margin: 6px 0 14px;
+    font-weight: 600;
+}
+#messageBox.success {
+    color: green;
+}
+#messageBox.error {
+    color: #b00020;
+}
+ul {
+    padding-left: 0;
+}
 li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin: 8px 0;
+}
+
+.taskText {
+    flex: 1;
+}
+
+.actionButton {
+    min-width: 95px;
 }

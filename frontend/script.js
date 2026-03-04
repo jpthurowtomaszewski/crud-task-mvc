@@ -6,55 +6,102 @@ const API_URL = "https://crud-task-mvc.onrender.com";
 const titleInput = document.getElementById("titleInput");
 const addButton = document.getElementById("addButton");
 const taskList = document.getElementById("taskList");
+const messageBox = document.getElementById("messageBox");
 
-// funcao que busca no backend e desenha a lista na tela
+// funcao pra mostrar mensagem na tela
+function showMessage(text, type) {
+    // texto da mensagem
+    messageBox.textContent = text;
+
+    // classe pra mudar cor (sucesso ou erro)
+    messageBox.className = type;
+
+    // limpa depois de 2.5 segundos
+    setTimeout(() => {
+        messageBox.textContent = "";
+        messageBox.className = "";
+    }, 2500);
+}
+
+// função que busca no backend e lista na tela
 async function loadTasks() {
-    // faz requisicao GET /tasks
-    const response = await fetch(`${API_URL}/tasks`);
+    try {
+        // faz requisicao GET /tasks
+        const response = await fetch(`${API_URL}/tasks`);
 
-    // converte resposta pra json
-    const tasks = await response.json();
+        // se der erro http, aviso e paro
+        if (!response.ok) {
+            showMessage("Deu erro ao carregar tasks", "error");
+            return;
+        }
 
-    // limpa a lista antes de renderizar de novo
-    taskList.innerHTML = "";
+        // converte resposta pra json
+        const tasks = await response.json();
 
-    // percorro cada task que veio da api
-    tasks.forEach((task) => {
-        // crio um item de lista <li>
-        const li = document.createElement("li");
+        // limpa a lista antes de renderizar de novo
+        taskList.innerHTML = "";
 
-        // crio um texto base da task
-        const text = document.createElement("span");
-        text.textContent = `${task.title} - done: ${task.done}`;
+        // percorro cada task que veio da api
+        tasks.forEach((task) => {
+            // crio um item de lista <li>
+            const li = document.createElement("li");
 
-        // botao de deletar
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Deletar";
+            // checkbox pra marcar concluida
+            const doneLabel = document.createElement("span");
+            doneLabel.textContent = "Task Concluida:";
 
-        // quando clicar, chama a funcao de deletar passando id
-        deleteButton.addEventListener("click", () => {
-            deleteTask(task.id);
+            const doneCheckbox = document.createElement("input");
+            doneCheckbox.type = "checkbox";
+            doneCheckbox.checked = task.done;
+
+            // quando marca/desmarca, atualiza so o done
+            doneCheckbox.addEventListener("change", () => {
+                updateTaskDone(task.id, doneCheckbox.checked);
+            });
+
+            // crio um texto base da task
+            const text = document.createElement("span");
+            text.textContent = `Task: ${task.title}`;
+            text.className = "taskText";
+
+            // botao de deletar
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Deletar";
+            deleteButton.className = "actionButton";
+
+            // quando clicar, chama a funcao de deletar passando id
+            deleteButton.addEventListener("click", () => {
+                deleteTask(task.id);
+            });
+
+            // botao de atualizar
+            const updateButton = document.createElement("button");
+            updateButton.textContent = "Atualizar";
+            updateButton.className = "actionButton";
+
+            // quando clicar, chama a funcao de atualizar passando a task inteira
+            updateButton.addEventListener("click", () => {
+                updateTask(task);
+            });
+
+            // coloco o texto e os botoes dentro do li
+            li.appendChild(doneLabel);
+            li.appendChild(doneCheckbox);
+            li.appendChild(document.createTextNode(" | "));
+            li.appendChild(document.createTextNode(" "));
+            li.appendChild(text);
+            li.appendChild(document.createTextNode(" "));
+            li.appendChild(updateButton);
+            li.appendChild(document.createTextNode(" "));
+            li.appendChild(deleteButton);
+
+            // adiciono esse <li> dentro da ul
+            taskList.appendChild(li);
         });
-
-        // botao de atualizar
-        const updateButton = document.createElement("button");
-        updateButton.textContent = "Atualizar";
-
-        // quando clicar, chama a funcao de atualizar passando a task inteira
-        updateButton.addEventListener("click", () => {
-            updateTask(task);
-        });
-
-        // coloco o texto e os botoes dentro do li
-        li.appendChild(text);
-        li.appendChild(document.createTextNode(" "));
-        li.appendChild(updateButton);
-        li.appendChild(document.createTextNode(" "));
-        li.appendChild(deleteButton);
-
-        // adiciono esse <li> dentro da ul
-        taskList.appendChild(li);
-    });
+    } catch (error) {
+        // erro de rede/conexao
+        showMessage("Sem conexao com o backend", "error");
+    }
 }
 
 // funcao chamada quando clica no botao adicionar
@@ -64,22 +111,35 @@ async function createTask() {
 
     // se vier vazio, nao deixa continuar
     if (!title) {
-        alert("Escreve um titulo ae");
+        showMessage("Escreve um titulo ae", "error");
         return;
     }
 
-    // faz requisicao POST /tasks pra criar no banco
-    await fetch(`${API_URL}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title })
-    });
+    try {
+        // faz requisicao POST /tasks pra criar no banco
+        const response = await fetch(`${API_URL}/tasks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title })
+        });
 
-    // limpa input depois de criar
-    titleInput.value = "";
+        // se deu erro http, aviso
+        if (!response.ok) {
+            showMessage("Nao consegui criar a task", "error");
+            return;
+        }
 
-    // recarrega lista pra mostrar a task nova
-    loadTasks();
+        // limpa input depois de criar
+        titleInput.value = "";
+
+        // mostra mensagem de sucesso
+        showMessage("Task criada com sucesso", "success");
+
+        // recarrega lista pra mostrar a task nova
+        loadTasks();
+    } catch (error) {
+        showMessage("Sem conexao com o backend", "error");
+    }
 }
 
 // funcao pra deletar task
@@ -91,45 +151,82 @@ async function deleteTask(id) {
         return;
     }
 
-    // faz requisicao DELETE /tasks/:id
-    await fetch(`${API_URL}/tasks/${id}`, {
-        method: "DELETE"
-    });
+    try {
+        // faz requisicao DELETE /tasks/:id
+        const response = await fetch(`${API_URL}/tasks/${id}`, {
+            method: "DELETE"
+        });
 
-    // recarrega lista depois de deletar
-    loadTasks();
+        // se deu erro http, aviso
+        if (!response.ok) {
+            showMessage("Nao consegui deletar", "error");
+            return;
+        }
+
+        // mostra mensagem de sucesso
+        showMessage("Task deletada", "success");
+
+        // recarrega lista depois de deletar
+        loadTasks();
+    } catch (error) {
+        showMessage("Sem conexao com o backend", "error");
+    }
 }
 
 // funcao pra atualizar task
 async function updateTask(task) {
-    // pego novo titulo com prompt (bem simples estilo iniciante)
-    const novoTitulo = prompt("Novo titulo da task:", task.title);
+    // pego novo titulo com prompt
+    const newTitle = prompt("Novo titulo da task:", task.title);
 
     // se cancelar o prompt, nao faz nada
-    if (novoTitulo === null) {
+    if (newTitle === null) {
         return;
     }
 
     // se vier vazio, nao atualiza
-    if (!novoTitulo.trim()) {
-        alert("Titulo nao pode ficar vazio");
+    if (!newTitle.trim()) {
+        showMessage("Titulo nao pode ficar vazio", "error");
         return;
     }
 
-    // movimento de genio: inverter done toda vez que atualizar
-    const novoDone = !task.done;
+    // aqui mantem o done atual (nao muda o status no update de titulo)
+    const newDone = task.done;
 
-    // faz requisicao PUT /tasks/:id
-    await fetch(`${API_URL}/tasks/${task.id}`, {
+    try {
+        // faz requisicao PUT /tasks/:id
+        const response = await fetch(`${API_URL}/tasks/${task.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: newTitle.trim(),
+                done: newDone
+            })
+        });
+
+        // se deu erro http, aviso
+        if (!response.ok) {
+            showMessage("Nao consegui atualizar", "error");
+            return;
+        }
+
+        // mostra mensagem de sucesso
+        showMessage("Task atualizada", "success");
+
+        // recarrega lista depois de atualizar
+        loadTasks();
+    } catch (error) {
+        showMessage("Sem conexao com o backend", "error");
+    }
+}
+
+// funcao pra atualizar done
+async function updateTaskDone(taskId, done) {
+    await fetch(`${API_URL}/tasks/${taskId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            title: novoTitulo.trim(),
-            done: novoDone
-        })
+        body: JSON.stringify({ done })
     });
 
-    // recarrega lista depois de atualizar
     loadTasks();
 }
 
