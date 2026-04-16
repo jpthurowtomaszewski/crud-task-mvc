@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #0b47c9;
+  color: #ffffff;
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 32px;
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #1d5be0;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 12px;
+  border: 1px solid #1d5be0;
+  border-radius: 4px;
+  background-color: #144fcf;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0f45b8;
+}
+
+.message-box {
+  min-height: 22px;
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+.message-box.success {
+  color: #b9ffd3;
+}
+
+.message-box.error {
+  color: #ffd6d6;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-list li {
+  background-color: #1b57d5;
+  border: 1px solid #2a66e3;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-text {
+  flex: 1;
+}
+
+.action-button {
+  min-width: 88px;
+}
+
+@media (max-width: 700px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .task-list li {
+    flex-wrap: wrap;
+  }
+}
